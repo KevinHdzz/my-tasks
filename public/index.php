@@ -47,6 +47,21 @@ $testCreateMethod = function () use ($newUser, $newTask): void {
     // $task2->save();
 };
 
+// $kavin = $newUser("Kavin", "kavin@kavin.com", "kavin123");
+// $kavin->save();
+
+// $task = $newTask("New task title", "New task description", TaskStatus::PENDING, 3);
+// $task->save();
+
+// debug(User::all());
+// debug(Task::all());
+
+// $task = Task::find(1);
+// debug($task);
+
+// $user = User::find(4);
+// debug($user);
+
 // $testCreateMethod();
 // $testFindMethod();
 // $testAllMethod();

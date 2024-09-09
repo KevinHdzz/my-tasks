@@ -2,6 +2,7 @@
 
 namespace Kevinhdzz\MyTasks\Models;
 
+use Kevinhdzz\MyTasks\Enums\ConversionFormats;
 use Kevinhdzz\MyTasks\Enums\TaskStatus;
 
 class Task extends BaseModel {
@@ -20,17 +21,16 @@ class Task extends BaseModel {
     public TaskStatus $status;
     public int $user_id;
 
-    protected static function formatColsToProps(): array
+    public static function formatPropsAndCols(ConversionFormats $format): array
     {
-        return [
-            'status' => fn (string $status): TaskStatus => TaskStatus::from($status),
-        ]; # + parent::formatColsToProps();
-    }
-
-    protected static function formatPropsToCols(): array
-    {
-        return [
-            'status' => fn (TaskStatus $status): string => $status->value,
-        ]; # + parent::formatColsToProps();
+        return parent::formatPropsAndCols($format) +
+            match ($format) {
+                ConversionFormats::COLS_TO_PROPS => [
+                    'status' => fn (string $status): TaskStatus => TaskStatus::from($status),
+                ],
+                ConversionFormats::PROPS_TO_COLS => [
+                    'status' => fn (TaskStatus $status): string => $status->value,
+                ],
+            };
     }
 }

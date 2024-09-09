@@ -3,7 +3,6 @@
 namespace Kevinhdzz\MyTasks\Models;
 
 use DateTime;
-use InvalidArgumentException;
 use Kevinhdzz\MyTasks\Database\DB;
 use Kevinhdzz\MyTasks\Enums\ConversionFormats;
 
@@ -14,9 +13,6 @@ class BaseModel {
     protected string $primaryKey = 'id';
     /** Non-updatable columns. */
     protected array $immutableColumns;
-
-    protected const COLS_TO_PROPS_FORMAT = 1;
-    protected const PROPS_TO_COLS_FORMAT = 2;
 
     public ?int $id = null;
 
@@ -58,7 +54,6 @@ class BaseModel {
     {
         return array_combine(
             $this->columns,
-            # Warning: Undefined property: Kevinhdzz\MyTasks\Models\User::$created_at
             array_map(function (string $col) {
                 if ($this->insertTimestamps && key_exists($col, $this->timestamps)) {
                     return $this->timestamps[$col];
@@ -71,47 +66,26 @@ class BaseModel {
 
     public function setProps(array $row): static
     {
-        # Pending: Do not format the data here.
+        $formattedRow = static::applyFormat($row, ConversionFormats::COLS_TO_PROPS);
+
         if ($this->insertTimestamps) {
-            $this->timestamps['created_at'] = static::formatColsToProps()['created_at']($row['created_at']);
-            $this->timestamps['updated_at'] = static::formatColsToProps()['updated_at']($row['updated_at']);
+            $this->timestamps['created_at'] = $formattedRow['created_at'];
+            $this->timestamps['updated_at'] = $formattedRow['updated_at'];
         }
         
-        foreach ($row as $col => $value) {
-            if (property_exists($this, $col)) {
-                $this->$col = isset(static::formatColsToProps()[$col]) ?
-                                  static::formatColsToProps()[$col]($value) : $value;
-            }
+        foreach ($formattedRow as $col => $value) {
+            if (property_exists($this, $col)) $this->$col = $value;
         }
 
         return $this;
     }
-    
 
-    // Remove if formatPropsAndCols() works correctly.
-    protected static function formatColsToProps(): array
-    {
-        return [
-            'created_at' => fn (string $date): DateTime => new DateTime($date),
-            'updated_at' => fn (string $date): DateTime => new DateTime($date),
-        ];
-    }
-
-    protected static function formatPropsToCols(): array
-    {
-        return [
-            'created_at' => fn (DateTime $date): string => $date->format('Y-m-d H:i:s'),
-            'updated_at' => fn (DateTime $date): string => $date->format('Y-m-d H:i:s'),
-        ];
-    }
-
-    
-    protected static function formatPropsAndCols(ConversionFormats $format = ConversionFormats::COLS_TO_PROPS): array
+    protected static function formatPropsAndCols(ConversionFormats $format): array
     {
         return match ($format) {
             ConversionFormats::COLS_TO_PROPS => [
-                'created_at' => fn (DateTime $date): string => $date->format('Y-m-d H:i:s'),
-                'updated_at' => fn (DateTime $date): string => $date->format('Y-m-d H:i:s'),
+                'created_at' => fn (string $date): DateTime => new DateTime($date),
+                'updated_at' => fn (string $date): DateTime => new DateTime($date),
             ],
             ConversionFormats::PROPS_TO_COLS => [
                 'created_at' => fn (DateTime $date): string => $date->format('Y-m-d H:i:s'),
@@ -120,41 +94,14 @@ class BaseModel {
         };
     }
 
-    protected static function applyFormatUsingEnum(array $columnValues, ConversionFormats $format = ConversionFormats::COLS_TO_PROPS): array
+    public static function applyFormat(array $columnValues, ConversionFormats $format): array
     {
         return array_combine(
             array_keys($columnValues),
             array_map(
                 function (string $col) use ($columnValues, $format): mixed {
                     $value = $columnValues[$col];
-                    # Pending testing both aways
                     return isset(static::formatPropsAndCols($format)[$col]) ? static::formatPropsAndCols($format)[$col]($value) : $value;
-                    // return match ($format) {
-                    //     ConversionFormats::COLS_TO_PROPS => isset(static::formatPropsAndCols(ConversionFormats::COLS_TO_PROPS)[$col]) ?
-                    //                                         static::formatPropsAndCols(ConversionFormats::COLS_TO_PROPS)[$col]($value) :
-                    //                                         $value,
-                    //     ConversionFormats::PROPS_TO_COLS => isset(static::formatPropsAndCols(ConversionFormats::PROPS_TO_COLS)[$col]) ?
-                    //                                         static::formatPropsAndCols(ConversionFormats::PROPS_TO_COLS)[$col]($value) :
-                    //                                         $value,
-                    // };
-                },
-                array_keys($columnValues)
-            )
-        );
-    }
-
-    protected static function applyFormat(array $columnValues, int $format = self::COLS_TO_PROPS_FORMAT): array
-    {
-        return array_combine(
-            array_keys($columnValues),
-            array_map(
-                function (string $col) use ($columnValues, $format): mixed {
-                    $value = $columnValues[$col];
-                    return match ($format) {
-                        self::COLS_TO_PROPS_FORMAT => isset(static::formatColsToProps()[$col]) ? static::formatColsToProps()[$col]($value) : $value,
-                        self::PROPS_TO_COLS_FORMAT => isset(static::formatPropsToCols()[$col]) ? static::formatPropsToCols()[$col]($value) : $value,
-                        default => throw new InvalidArgumentException("Invalid format option."),
-                    };
                 },
                 array_keys($columnValues)
             )
@@ -180,7 +127,7 @@ class BaseModel {
             $columnValues['updated_at'] = $columnValues['created_at'] = $this->timestamps['updated_at'] = $this->timestamps['created_at'] = new DateTime('now');
         }
 
-        $formattedColVals = static::applyFormat($columnValues, self::PROPS_TO_COLS_FORMAT);
+        $formattedColVals = static::applyFormat($columnValues, ConversionFormats::PROPS_TO_COLS);
 
         $columnsStr = implode(", ", array_keys($formattedColVals));
         $placeholders = implode(", ", array_fill(0, count($formattedColVals), "?"));
