@@ -7,25 +7,51 @@ use Kevinhdzz\MyTasks\Database\DB;
 use Kevinhdzz\MyTasks\Enums\ConversionFormats;
 
 class BaseModel {
+    /**
+     * Database connection instance.
+     */
     protected static DB $db;
+
+    /**
+     * The table associated with the model.
+     */
     protected string $table;
+
+    /**
+     * Columns of the table associated with the model.
+     */
     protected array $columns;
+
+    /**
+     * The primary key for the model.
+     */
     protected string $primaryKey = 'id';
-    /** Non-updatable columns. */
+    
+    /**
+     * Non-updatable columns.
+     */
     protected array $immutableColumns;
 
+    /**
+     * The model's unique identifier.
+     */
     public ?int $id = null;
 
-    /** Another way to handle timestamps */
+    /**
+     * Automatically insert 'created_at' and 'updated_at' columns.
+     */
     protected bool $insertTimestamps = true;
 
     /**
-     * Model timestamps. Is only initialized if `$insertTimestamps` is true.
+     * Model timestamps. Initialized only if `$insertTimestamps` is true.
      * 
      * @var array<string, DateTime|null> $timestamps
      */
     public array $timestamps;
 
+    /**
+     * Initialize model.
+     */
     public function __construct()
     {
         $this->immutableColumns = [$this->primaryKey];
@@ -44,29 +70,25 @@ class BaseModel {
         }
     }
 
+    /**
+     * Sets the database connection instance.
+     * 
+     * @param DB $db
+     */
     public static function setDb(DB $db): void
     {
         self::$db = $db;
     }
 
-    # Pending: Map columns with model properties values
-    public function columnValues(): array
-    {
-        return array_combine(
-            $this->columns,
-            array_map(function (string $col) {
-                if ($this->insertTimestamps && key_exists($col, $this->timestamps)) {
-                    return $this->timestamps[$col];
-                }
-                
-                return $this->$col;
-            }, $this->columns)
-        );
-    }
-
+    /**
+     * Sets model properties from a database row.
+     * 
+     * @param array<string, mixed> $row
+     * @return $this
+     */
     public function setProps(array $row): static
     {
-        $formattedRow = static::applyFormat($row, ConversionFormats::COLS_TO_PROPS);
+        $formattedRow = static::formatFields($row, ConversionFormats::COLS_TO_PROPS);
 
         if ($this->insertTimestamps) {
             $this->timestamps['created_at'] = $formattedRow['created_at'];
@@ -80,6 +102,33 @@ class BaseModel {
         return $this;
     }
 
+    /**
+     * Maps current model property values to their corresponding columns.
+     * 
+     * @return array  An associative array with column names as keys and the current property values as values.
+     */
+    public function mapPropertiesToColumns(): array
+    {
+        return array_combine(
+            $this->columns,
+            array_map(function (string $col) {
+                if ($this->insertTimestamps && key_exists($col, $this->timestamps)) {
+                    return $this->timestamps[$col];
+                }
+                
+                return $this->$col;
+            }, $this->columns)
+        );
+    }
+
+    /**
+     * Defines formatting rules for converting between model properties and database columns.
+     * 
+     * @param ConversionFormats $format  The conversion format specifying the direction of transformation
+     *                                   (e.g., columns to properties or properties to columns).
+     * 
+     * @return array<string, callable(mixed): mixed>  An associative array with column names as keys and formatting functions as values.
+     */
     protected static function formatPropsAndCols(ConversionFormats $format): array
     {
         return match ($format) {
@@ -94,40 +143,57 @@ class BaseModel {
         };
     }
 
-    public static function applyFormat(array $columnValues, ConversionFormats $format): array
+    /**
+     * Applies formatting rules to a set of fields based on the specified conversion format.
+     * Each field is transformed according to its associated formatting function if available.
+     * 
+     * @param array<string, mixed> $fields  An associative array where keys are column names and values are the data to be formatted.
+     * @param ConversionFormats $format  The conversion format specifying the direction of the transformation
+     *                                   (e.g., columns to properties or properties to columns).
+     * 
+     * @return array<string, mixed>  An associative array with formatted values based on the specified conversion format.
+     */
+    public static function formatFields(array $fields, ConversionFormats $format): array
     {
         return array_combine(
-            array_keys($columnValues),
+            array_keys($fields),
             array_map(
-                function (string $col) use ($columnValues, $format): mixed {
-                    $value = $columnValues[$col];
+                function (string $col) use ($fields, $format): mixed {
+                    $value = $fields[$col];
                     return isset(static::formatPropsAndCols($format)[$col]) ? static::formatPropsAndCols($format)[$col]($value) : $value;
                 },
-                array_keys($columnValues)
+                array_keys($fields)
             )
         );
     }
 
+    /**
+     * Saves the model's current state to the database.
+     * Creates a new record if the model's `$id` is null, otherwise, updates the existing record.
+     * 
+     * @return $this
+     */
     public function save(): static
     {
         return is_null($this->id) ? $this->create() : $this->update();
     }
 
+    /**
+     * Saves the current model in the database.
+     * 
+     * @return $this
+     */
     public function create(): static
     {
-        $columnValues = $this->columnValues();
+        $columnValues = $this->mapPropertiesToColumns();
         // Remove primary key, so that the database inserts it.
         unset($columnValues[$this->primaryKey]);
         
         if ($this->insertTimestamps) {
-            // $this->timestamps['created_at'] = new DateTime('now');
-            // $this->timestamps['updated_at'] = $this->timestamps['created_at'];
-            // $columnValues['created_at'] = $this->timestamps['created_at'];
-            // $columnValues['updated_at'] = $this->timestamps['updated_at'];
             $columnValues['updated_at'] = $columnValues['created_at'] = $this->timestamps['updated_at'] = $this->timestamps['created_at'] = new DateTime('now');
         }
 
-        $formattedColVals = static::applyFormat($columnValues, ConversionFormats::PROPS_TO_COLS);
+        $formattedColVals = static::formatFields($columnValues, ConversionFormats::PROPS_TO_COLS);
 
         $columnsStr = implode(", ", array_keys($formattedColVals));
         $placeholders = implode(", ", array_fill(0, count($formattedColVals), "?"));
@@ -138,9 +204,14 @@ class BaseModel {
         return $this;
     }
 
+    /**
+     * Updates the model in the database with its current state.
+     * 
+     * @return $this
+     */
     private function update(): static
     {
-        $formattedColVals = $this->applyFormat($this->columnValues(), ConversionFormats::PROPS_TO_COLS);
+        $formattedColVals = $this->formatFields($this->mapPropertiesToColumns(), ConversionFormats::PROPS_TO_COLS);
         
         foreach ($this->immutableColumns as $col) {
             unset($formattedColVals[$col]);  
@@ -162,6 +233,11 @@ class BaseModel {
         return $this;
     }
 
+    /**
+     * Retrieves all models from the database.
+     * 
+     * @return static[]
+     */
     public static function all(): array
     {
         $model = new static();
@@ -179,6 +255,12 @@ class BaseModel {
         return $models;
     }
 
+    /**
+     * Finds a model with the given `$id`.
+     * 
+     * @param int $id
+     * @return static|null  The model instance if found, otherwise null.
+     */
     public static function find(int $id): ?static
     {
         $model = new static();

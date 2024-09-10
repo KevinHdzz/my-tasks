@@ -37,12 +37,12 @@ $testUpdateMethod = function (): void {
     // $task->save();
 
     $user = User::find(2);
-    debug($user->columnValues());
+    debug($user->mapPropertiesToColumns());
 
     println("<br>Updated data:");
     $user->email = "test@test.com";
     $user->password = "test123";
-    debug($user->columnValues());
+    debug($user->mapPropertiesToColumns());
 
     println("<br>Saving changes:");
     $user->save();
@@ -106,14 +106,14 @@ $testAllMethod = function (): void {
     println("Tasks:");
     foreach ($tasks as $task)
     {
-        debug($task->columnValues());
+        debug($task->mapPropertiesToColumns());
     }
 
     println();
     println("Users:");
     foreach (User::all() as $user)
     {
-        debug($user->columnValues());
+        debug($user->mapPropertiesToColumns());
     }
 };
 
@@ -121,11 +121,11 @@ $testAllMethod = function (): void {
 $testFindMethod = function (): void {
     $user = User::find(3);
     debug($user);
-    debug($user->columnValues());
+    debug($user->mapPropertiesToColumns());
 
     $task = Task::find(1);
     debug($task);
-    debug($task->columnValues());
+    debug($task->mapPropertiesToColumns());
 };
 
 $task->title = "Anything";
