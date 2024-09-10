@@ -140,20 +140,24 @@ class BaseModel {
 
     private function update(): static
     {
-        $columns = $this->columns;
-        debug($columns);
-
-        // Remove immutable columns
-        foreach ($this->immutableColumns as $immCol) {
-            if (in_array($immCol, $columns)) {
-                $immColIndex = array_search($immCol, $columns);
-                unset($immColIndex);
-            }
+        $formattedColVals = $this->applyFormat($this->columnValues(), ConversionFormats::PROPS_TO_COLS);
+        
+        foreach ($this->immutableColumns as $col) {
+            unset($formattedColVals[$col]);  
         }
-        debug($columns);
+        
+        if ($this->insertTimestamps) {
+            $this->timestamps['updated_at'] = new DateTime('now');
+            $formattedColVals['updated_at'] = (
+                static::formatPropsAndCols(ConversionFormats::PROPS_TO_COLS)['updated_at']($this->timestamps['updated_at'])
+            );
+        }
 
- 
-        // $columnValues = $this->columnValues();
+        $sets = array_map(fn (string $col) => "$col = ?", array_keys($formattedColVals));
+        $setsStr = implode(", ", $sets);
+        $query = "UPDATE $this->table SET $setsStr WHERE id = ?";
+
+        self::$db->statement($query, array_values($formattedColVals + [$this->id]));
         
         return $this;
     }

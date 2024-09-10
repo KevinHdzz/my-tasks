@@ -25,6 +25,58 @@ $newTask = function (string $title, string $description, TaskStatus $status, int
     return $task;
 };
 
+$testUpdateMethod = function (): void {
+    $task = Task::find(2);
+    // debug($task);
+
+    // println("<br>Updated data:");
+    // $task->status = TaskStatus::COMPLETED;
+    // debug($task->columnValues());
+
+    // println("<br>Saving changes:");
+    // $task->save();
+
+    $user = User::find(2);
+    debug($user->columnValues());
+
+    println("<br>Updated data:");
+    $user->email = "test@test.com";
+    $user->password = "test123";
+    debug($user->columnValues());
+
+    println("<br>Saving changes:");
+    $user->save();
+
+    exit;
+    
+    $user = User::find(7);
+    debug($user->columnValues());
+
+    println("<br>Updated data:");
+    $user->username = "Bizor";
+    $user->email = "bizor@bizor.com";
+    $user->password = "bizor123";
+    debug($user->columnValues());
+
+    println("<br>Saving changes:");
+    $user->save();
+};
+
+
+// $kavin = $newUser("Kavin", "kavin@kavin.com", "kavin123");
+// $kavin->save();
+
+// $task = $newTask("New task title", "New task description", TaskStatus::PENDING, 3);
+// $task->save();
+
+$testUpdateMethod();
+// $testCreateMethod();
+// $testFindMethod();
+// $testAllMethod();
+
+exit;
+
+// Successfull
 $testCreateMethod = function () use ($newUser, $newTask): void {
     // $user = (new User())->construct("djfsd", "ldfjs", "ldjflsd");
     // $user->construct("xd", "xdd", "xddd");
@@ -46,27 +98,6 @@ $testCreateMethod = function () use ($newUser, $newTask): void {
     $task2 = $newTask("Test task title", "Test task description", TaskStatus::PENDING, 4);
     // $task2->save();
 };
-
-// $kavin = $newUser("Kavin", "kavin@kavin.com", "kavin123");
-// $kavin->save();
-
-// $task = $newTask("New task title", "New task description", TaskStatus::PENDING, 3);
-// $task->save();
-
-// debug(User::all());
-// debug(Task::all());
-
-// $task = Task::find(1);
-// debug($task);
-
-// $user = User::find(4);
-// debug($user);
-
-// $testCreateMethod();
-// $testFindMethod();
-// $testAllMethod();
-
-exit;
 
 // Successfull
 $testAllMethod = function (): void {

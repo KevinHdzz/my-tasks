@@ -21,6 +21,13 @@ class Task extends BaseModel {
     public TaskStatus $status;
     public int $user_id;
 
+    public function __construct()
+    {
+        parent::__construct();
+
+        $this->immutableColumns[] = 'user_id';
+    }
+    
     public static function formatPropsAndCols(ConversionFormats $format): array
     {
         return parent::formatPropsAndCols($format) +
