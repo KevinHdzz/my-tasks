@@ -2,9 +2,28 @@
 
 require '../bootstrap/app.php';
 
+use Kevinhdzz\MyTasks\Controllers\TaskController;
 use Kevinhdzz\MyTasks\Models\Task;
 use Kevinhdzz\MyTasks\Models\User;
 use Kevinhdzz\MyTasks\Enums\TaskStatus;
+use Kevinhdzz\MyTasks\Routing\Route;
+use Kevinhdzz\MyTasks\Routing\Router;
+
+
+Router::get(new Route(path: "/tasks", action: [TaskController::class, "list"]));
+Router::get(new Route("/tasks/create", fn () => "Add new Task"));
+Router::get(new Route("/tasks/update", function (Route $route) {
+    debug($route->queryParams());
+}, queryParams: ["id"]));
+
+
+
+Router::resolve();
+
+// debug(Router::$routes);
+exit;
+
+
 
 $newUser = function (string $username, string $email, string $password): User {
     $user = new User();
@@ -69,7 +88,7 @@ $testUpdateMethod = function (): void {
 // $task = $newTask("New task title", "New task description", TaskStatus::PENDING, 3);
 // $task->save();
 
-$testUpdateMethod();
+// $testUpdateMethod();
 // $testCreateMethod();
 // $testFindMethod();
 // $testAllMethod();

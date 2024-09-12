@@ -25,7 +25,7 @@ class BaseModel {
     /**
      * The primary key for the model.
      */
-    protected string $primaryKey = 'id';
+    protected string $primaryKey = "id";
     
     /**
      * Non-updatable columns.
@@ -58,15 +58,15 @@ class BaseModel {
 
         if ($this->insertTimestamps) {
             $this->timestamps = [
-                'created_at' => null,
-                'updated_at' => null,
+                "created_at" => null,
+                "updated_at" => null,
             ];
 
             if (!in_array($this->primaryKey, $this->columns)) $this->columns[] = $this->primaryKey;
-            if (!in_array('created_at', $this->columns)) $this->columns[] = 'created_at';
-            if (!in_array('updated_at', $this->columns)) $this->columns[] = 'updated_at';
+            if (!in_array("created_at", $this->columns)) $this->columns[] = "created_at";
+            if (!in_array("updated_at", $this->columns)) $this->columns[] = "updated_at";
 
-            $this->immutableColumns[] = 'created_at';
+            $this->immutableColumns[] = "created_at";
         }
     }
 
@@ -91,8 +91,8 @@ class BaseModel {
         $formattedRow = static::formatFields($row, ConversionFormats::COLS_TO_PROPS);
 
         if ($this->insertTimestamps) {
-            $this->timestamps['created_at'] = $formattedRow['created_at'];
-            $this->timestamps['updated_at'] = $formattedRow['updated_at'];
+            $this->timestamps["created_at"] = $formattedRow["created_at"];
+            $this->timestamps["updated_at"] = $formattedRow["updated_at"];
         }
         
         foreach ($formattedRow as $col => $value) {
@@ -133,12 +133,12 @@ class BaseModel {
     {
         return match ($format) {
             ConversionFormats::COLS_TO_PROPS => [
-                'created_at' => fn (string $date): DateTime => new DateTime($date),
-                'updated_at' => fn (string $date): DateTime => new DateTime($date),
+                "created_at" => fn (string $date): DateTime => new DateTime($date),
+                "updated_at" => fn (string $date): DateTime => new DateTime($date),
             ],
             ConversionFormats::PROPS_TO_COLS => [
-                'created_at' => fn (DateTime $date): string => $date->format('Y-m-d H:i:s'),
-                'updated_at' => fn (DateTime $date): string => $date->format('Y-m-d H:i:s'),
+                "created_at" => fn (DateTime $date): string => $date->format("Y-m-d H:i:s"),
+                "updated_at" => fn (DateTime $date): string => $date->format("Y-m-d H:i:s"),
             ],
         };
     }
@@ -190,7 +190,7 @@ class BaseModel {
         unset($columnValues[$this->primaryKey]);
         
         if ($this->insertTimestamps) {
-            $columnValues['updated_at'] = $columnValues['created_at'] = $this->timestamps['updated_at'] = $this->timestamps['created_at'] = new DateTime('now');
+            $columnValues["updated_at"] = $columnValues["created_at"] = $this->timestamps["updated_at"] = $this->timestamps["created_at"] = new DateTime('now');
         }
 
         $formattedColVals = static::formatFields($columnValues, ConversionFormats::PROPS_TO_COLS);
@@ -218,9 +218,9 @@ class BaseModel {
         }
         
         if ($this->insertTimestamps) {
-            $this->timestamps['updated_at'] = new DateTime('now');
-            $formattedColVals['updated_at'] = (
-                static::formatPropsAndCols(ConversionFormats::PROPS_TO_COLS)['updated_at']($this->timestamps['updated_at'])
+            $this->timestamps["updated_at"] = new DateTime("now");
+            $formattedColVals["updated_at"] = (
+                static::formatPropsAndCols(ConversionFormats::PROPS_TO_COLS)["updated_at"]($this->timestamps["updated_at"])
             );
         }
 
