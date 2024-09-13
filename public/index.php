@@ -6,23 +6,38 @@ use Kevinhdzz\MyTasks\Controllers\TaskController;
 use Kevinhdzz\MyTasks\Models\Task;
 use Kevinhdzz\MyTasks\Models\User;
 use Kevinhdzz\MyTasks\Enums\TaskStatus;
-use Kevinhdzz\MyTasks\Routing\Route;
 use Kevinhdzz\MyTasks\Routing\Router;
+use Kevinhdzz\MyTasks\Routing\Route;
+use Kevinhdzz\MyTasks\Exceptions\HttpNotFoundException;
 
 
-Router::get(new Route(path: "/tasks", action: [TaskController::class, "list"]));
-Router::get(new Route("/tasks/create", fn () => "Add new Task"));
+Router::get(new Route(path: "/tasks", action: function () {
+    println("<h2>Tasks:</h2>");
+    $tasks = Task::all();
+    foreach ($tasks as $task) {
+        println("$task->title  -  $task->description  -  {$task->status->value}  -  $task->user_id");
+        println();
+    }
+}, parameters: ["name", "id"]));
+Router::get(new Route("/tasks/create", fn () => print "Add new Task"));
 Router::get(new Route("/tasks/update", function (Route $route) {
-    debug($route->queryParams());
-}, queryParams: ["id"]));
+    debug($route->parameters());
+}, parameters: ["id"]));
 
 
+Router::post(new Route("tasks/create", function (Route $route) {
+    debug($_POST);
+}));
 
-Router::resolve();
+
+try {
+    Router::resolve();
+} catch (HttpNotFoundException $e) {
+    println($e->getMessage());
+}
 
 // debug(Router::$routes);
 exit;
-
 
 
 $newUser = function (string $username, string $email, string $password): User {
@@ -35,7 +50,7 @@ $newUser = function (string $username, string $email, string $password): User {
 };
 
 $newTask = function (string $title, string $description, TaskStatus $status, int $userId): Task {
-    $task = new Task;   
+    $task = new Task;
     $task->title = $title;
     $task->description = $description;
     $task->status = $status;
@@ -67,7 +82,7 @@ $testUpdateMethod = function (): void {
     $user->save();
 
     exit;
-    
+
     $user = User::find(7);
     debug($user->columnValues());
 
@@ -123,15 +138,13 @@ $testAllMethod = function (): void {
     $tasks = Task::all();
 
     println("Tasks:");
-    foreach ($tasks as $task)
-    {
+    foreach ($tasks as $task) {
         debug($task->mapPropertiesToColumns());
     }
 
     println();
     println("Users:");
-    foreach (User::all() as $user)
-    {
+    foreach (User::all() as $user) {
         debug($user->mapPropertiesToColumns());
     }
 };
