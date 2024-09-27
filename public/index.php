@@ -2,7 +2,8 @@
 
 require '../bootstrap/app.php';
 
-use Kevinhdzz\MyTasks\Controllers\TaskController;
+use Kevinhdzz\MyTasks\Controllers\AuthController;
+use Kevinhdzz\MyTasks\Controllers\Controller;
 use Kevinhdzz\MyTasks\Models\Task;
 use Kevinhdzz\MyTasks\Models\User;
 use Kevinhdzz\MyTasks\Enums\TaskStatus;
@@ -10,6 +11,27 @@ use Kevinhdzz\MyTasks\Routing\Router;
 use Kevinhdzz\MyTasks\Routing\Route;
 use Kevinhdzz\MyTasks\Exceptions\HttpNotFoundException;
 
+
+Router::get(new Route(path: "/home", action: function () {
+    session_start();
+    debug($_SESSION);
+    // if (!isset($_SESSION["user"])) {
+    //     header("Location: /login");
+    // }
+    Controller::render("home", [
+        "users" => User::all(),
+        "tasks" => Task::all(),
+    ]);
+}, parameters: []));
+Router::get(new Route("/register", [AuthController::class, 'register']));
+Router::post(new Route("/register", [AuthController::class, 'register']));
+Router::get(new Route("/login", [AuthController::class, 'login']));
+Router::post(new Route("/login", [AuthController::class, 'login']));
+Router::get(new Route("/logout", function () {
+    session_start();
+    session_destroy();
+    header("Location: /home");
+}));
 
 Router::get(new Route(path: "/tasks", action: function () {
     println("<h2>Tasks:</h2>");
@@ -19,6 +41,7 @@ Router::get(new Route(path: "/tasks", action: function () {
         println();
     }
 }, parameters: ["name", "id"]));
+
 Router::get(new Route("/tasks/create", fn () => print "Add new Task"));
 Router::get(new Route("/tasks/update", function (Route $route) {
     debug($route->parameters());

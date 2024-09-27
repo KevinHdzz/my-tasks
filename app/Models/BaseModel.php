@@ -200,6 +200,8 @@ class BaseModel {
         $query = "INSERT INTO $this->table ($columnsStr) VALUES ($placeholders)";
 
         self::$db->statement($query, array_values($formattedColVals));
+        
+        $this->id = self::$db->pdo->lastInsertId();
 
         return $this;
     }
@@ -231,6 +233,31 @@ class BaseModel {
         self::$db->statement($query, array_values($formattedColVals + [$this->id]));
         
         return $this;
+    }
+
+    /**
+     * Get the models where `$column` = `$value`.
+     * 
+     * @param string $column
+     * @param mixed $value
+     * @return static[]
+     */
+    public static function where(string $column, mixed $value): array
+    {
+        $model = new static;
+        $rows = self::$db->statement("SELECT * FROM $model->table WHERE $column = ?", [$value]);
+
+        if (count($rows) == 0) {
+            return [];
+        }
+
+        $models = [$model->setProps($rows[0])];
+
+        for ($i = 1; $i < count($rows); $i++) { 
+            $models[] = (new static())->setProps($rows[$i]);
+        }
+        
+        return $models;
     }
 
     /**

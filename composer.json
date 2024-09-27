@@ -6,7 +6,10 @@
         "psr-4": {
             "Kevinhdzz\\MyTasks\\": "app/"
         },
-        "files": ["app/Helpers/functions.php"]
+        "files": [
+            "app/Helpers/functions.php",
+            "app/Helpers/array.php"
+        ]
     },
     "authors": [
         {

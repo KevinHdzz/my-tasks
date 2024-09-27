@@ -1,0 +1,300 @@
+:root {
+    --primary: #0CA789;
+    --secondary: #045dbdf5;
+    --pale-aqua: #f4f8f7;
+    --green-sea: #04b445;
+    --dark: #212121;
+    --primary-font: 'Courier New', Courier, monospace;
+    /* color-scheme: light dark; */
+}
+
+html {
+    font-size: 62.5%;
+}
+
+body {
+    font-size: 17px;
+    font-family: var(--primary-font);
+    height: 100vh;
+}
+
+.container {
+    width: 95%;
+    max-width: 1400px;
+    margin: 0 auto;
+    /* font-family: ; */
+}
+
+.small-container {
+    width: 95%;
+    max-width: 1150px;
+    margin: 0 auto;
+}
+
+.btn {
+    border: none;
+    text-decoration: none;
+    background-color: var(--secondary);
+    color: white;
+    padding: 1rem 2rem;
+    border-radius: 5%;
+    cursor: pointer;
+}
+
+.text-center {
+    text-align: center;
+}
+
+.flex {
+    display: flex;
+}
+
+.justify-end {
+    justify-content: end;
+}
+
+.align-items-center {
+    align-items: center;
+}
+
+.pt-1 {
+    padding-top: 1rem;
+}
+
+.gap-1 {
+    gap: 1rem;
+}
+
+.gap-2 {
+    gap: 2rem;
+}
+
+.gap-3 {
+    gap: 3rem;
+}
+
+.hidden {
+    visibility: hidden;
+}
+
+.no-email {
+    color: #5c5b5b;
+}
+
+.header {
+    background-color: var(--pale-aqua);
+    padding: 2.4rem 0;
+}
+
+.navbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.navbar a {
+    color: var(--dark);
+    text-decoration: none;
+}
+
+.navbar-logo a {
+    font-size: 3.2rem;
+    font-weight: 500;
+}
+
+.navbar-nav {
+    display: flex;
+    align-items: center;
+    gap: 4rem;
+}
+
+.navbar-nav a {
+    font-size: 1.8rem;
+}
+
+.navbar-nav svg {
+    cursor: pointer;
+}
+
+.main {
+    margin-top: 8rem;
+}
+
+.new-contact {
+    padding: 3rem 0;
+}
+
+.new-contact-btn {
+    padding: 1.2rem 2.4rem;
+}
+
+.contacts {
+    padding: 1rem 2rem;
+}
+
+.contact {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin: 3rem 0;
+}
+
+.contact .name p {
+    font-size: 2rem;
+}
+
+.contact .contact-field {
+    margin: 0;
+}
+
+.contact .remaining-fields {
+    display: flex;
+    gap: 5rem;
+    align-items: center;
+}
+
+.contact .remaining-fields .phone {
+    gap: .5rem;
+    font-weight: 500;
+    color: var(--green-sea);
+}
+
+.contact .options {
+    position: relative;
+    padding-left: 1.4rem;
+}
+
+.contact .options .options-list {
+    background-color: #e1ebe9;
+    padding: 1rem 2rem;
+    position: absolute;
+    right: 0;
+    top: 0;
+    z-index: 2;
+}
+
+.contact .options .options-list .option {
+    padding: .8rem 1rem;
+}
+
+.contact .options .options-list a {
+    display: inline-block;
+    text-decoration: none;
+    color: var(--dark);
+}
+
+.contact .options .options-list form input {
+    background-color: inherit;
+    border: none;
+    cursor: pointer;
+}
+
+.contact .options .options-icon {
+    cursor: pointer;
+}
+
+/* Form */
+.form-container {
+    position: relative;
+    height: calc(100vh - 100px);
+    display: flex;
+    justify-content: center;
+}
+
+.form {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-60%);
+    max-width: 55rem;
+    width: 100%;
+    padding: 2.5rem;
+    background-color: white;
+    border-radius: 5px;
+    box-shadow: 0 0 8px rgba(0, 0, 0, 0.1);
+}
+
+.form > p {
+    font-size: 2.8rem;
+    font-weight: 500;
+    margin-top: 1rem;
+    margin-bottom: 3.5rem;
+    margin: .5rem 0 3.5rem;
+}
+
+.form .field {
+    display: flex;
+    align-items: first baseline;
+    margin-bottom: 2rem;
+}
+
+.form .field label {
+    width: 9rem;
+    margin-right: 1rem;
+    text-align: right;
+}
+
+.form.login .field {
+    flex-direction: column;
+    align-items: normal;
+}
+
+.form.login .field label {
+    width: 100%;
+    text-align: left;
+    margin: 0 0 1rem;
+}
+
+.form .field-input {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+}
+
+.form .field-input input {
+    padding: 1rem;
+    font-size: 1.5rem;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+}
+
+.form .field-input .error-msg {
+    color: #e71515;
+    margin: .8rem 0 0;
+    font-size: 1.5rem;
+}
+
+.form .submit {
+    padding-top: .8rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.form .submit p {
+    font-size: 1.5rem;
+}
+
+.form .submit p a {
+    color: var(--secondary);
+    text-decoration: none;
+}
+
+.form .submit .submit-btn {
+    padding: 1rem 2.4rem;
+    /* color: white; */
+    border-radius: 3px;
+    background-color: var(--secondary);
+}
+
+.head-errors {
+    width: 90%;
+    margin: 0 auto 4rem;
+}
+
+.head-errors .error-msg {
+    background-color: #e43838;
+    padding: 1rem 0;
+    color: white;
+    text-align: center;
+    font-size: 1.8rem;
+}
