@@ -1,6 +1,6 @@
 <?php
 
-namespace Kevinhdzz\MyTasks\Routing;
+namespace MyTasks\Routing;
 
 enum HttpMethod: string {
     case GET = "GET";

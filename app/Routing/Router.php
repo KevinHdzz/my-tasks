@@ -1,8 +1,8 @@
 <?php
 
-namespace Kevinhdzz\MyTasks\Routing;
+namespace MyTasks\Routing;
 
-use Kevinhdzz\MyTasks\Exceptions\HttpNotFoundException;
+use MyTasks\Exceptions\HttpNotFoundException;
 
 /**
  * Manages HTTP routes and executes corresponding actions.

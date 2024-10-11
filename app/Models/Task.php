@@ -1,9 +1,9 @@
 <?php
 
-namespace Kevinhdzz\MyTasks\Models;
+namespace MyTasks\Models;
 
-use Kevinhdzz\MyTasks\Enums\ConversionFormats;
-use Kevinhdzz\MyTasks\Enums\TaskStatus;
+use MyTasks\Enums\ConversionFormats;
+use MyTasks\Enums\TaskStatus;
 
 class Task extends BaseModel {
     protected string $table = 'tasks';
@@ -21,11 +21,16 @@ class Task extends BaseModel {
     public TaskStatus $status;
     public int $user_id;
 
-    public function __construct()
+    public function __construct(?string $title = null, ?string $description = null, ?TaskStatus $status = null, ?int $user_id = null)
     {
         parent::__construct();
 
         $this->immutableColumns[] = 'user_id';
+
+        if (!is_null($title)) $this->title = $title;
+        if (!is_null($description)) $this->description = $description;
+        if (!is_null($status)) $this->status = $status;
+        if (!is_null($user_id)) $this->user_id = $user_id;
     }
     
     public static function formatPropsAndCols(ConversionFormats $format): array

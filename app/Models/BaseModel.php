@@ -1,10 +1,10 @@
 <?php
 
-namespace Kevinhdzz\MyTasks\Models;
+namespace MyTasks\Models;
 
 use DateTime;
-use Kevinhdzz\MyTasks\Database\DB;
-use Kevinhdzz\MyTasks\Enums\ConversionFormats;
+use MyTasks\Database\DB;
+use MyTasks\Enums\ConversionFormats;
 
 class BaseModel {
     /**
@@ -126,7 +126,6 @@ class BaseModel {
      * 
      * @param ConversionFormats $format  The conversion format specifying the direction of transformation
      *                                   (e.g., columns to properties or properties to columns).
-     * 
      * @return array<string, callable(mixed): mixed>  An associative array with column names as keys and formatting functions as values.
      */
     protected static function formatPropsAndCols(ConversionFormats $format): array
@@ -150,7 +149,6 @@ class BaseModel {
      * @param array<string, mixed> $fields  An associative array where keys are column names and values are the data to be formatted.
      * @param ConversionFormats $format  The conversion format specifying the direction of the transformation
      *                                   (e.g., columns to properties or properties to columns).
-     * 
      * @return array<string, mixed>  An associative array with formatted values based on the specified conversion format.
      */
     public static function formatFields(array $fields, ConversionFormats $format): array

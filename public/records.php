@@ -16,8 +16,8 @@
 
 require "../bootstrap/app.php";
 
-use Kevinhdzz\MyTasks\Models\User;
-use Kevinhdzz\MyTasks\Models\Task;
+use MyTasks\Models\User;
+use MyTasks\Models\Task;
 
 $users = User::all();
 $tasks = Task::all();

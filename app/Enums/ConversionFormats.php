@@ -1,6 +1,6 @@
 <?php
 
-namespace Kevinhdzz\MyTasks\Enums;
+namespace MyTasks\Enums;
 
 enum ConversionFormats: int {
     case COLS_TO_PROPS = 1;

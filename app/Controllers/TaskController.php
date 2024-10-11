@@ -1,13 +1,28 @@
 <?php
 
-namespace Kevinhdzz\MyTasks\Controllers;
+namespace MyTasks\Controllers;
 
-use Kevinhdzz\MyTasks\Routing\Route;
+use MyTasks\Enums\TaskStatus;
+use MyTasks\Exceptions\HttpNotFoundException;
+use MyTasks\Models\Task;
 
 class TaskController {
-    public static function list(Route $route): void
+    public static function changeStatus(): void
     {
-        println("List Task from TaskController");
-        debug($route->parameters());
+        $task = Task::find($_GET["task-id"]);
+
+        if (is_null($task))
+            throw new HttpNotFoundException("HTTP 404 NOT FOUND.");
+
+        if (is_null(TaskStatus::tryFrom($_GET["status"]))) header("Location: /");
+        
+        $task->status = match (TaskStatus::from($_GET["status"])) {
+            TaskStatus::COMPLETED => TaskStatus::PENDING,
+            TaskStatus::PENDING => TaskStatus::COMPLETED,
+        };
+        
+        $task->save();
+
+        header("Location: /");
     }
 }

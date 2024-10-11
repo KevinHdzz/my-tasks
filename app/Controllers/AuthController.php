@@ -1,19 +1,22 @@
 <?php
 
-namespace Kevinhdzz\MyTasks\Controllers;
+namespace MyTasks\Controllers;
 
-use Kevinhdzz\MyTasks\Helpers\Validator;
-use Kevinhdzz\MyTasks\Models\User;
+use MyTasks\Helpers\Validator;
+use MyTasks\Models\User;
+use MyTasks\View\View;
 
-class AuthController extends Controller {
+class AuthController {
     public static function register(): void
     {
         if (isAuth()) {
             header("Location: /home");
         }
 
+        $view = "auth/register";
+
         switch ($_SERVER["REQUEST_METHOD"]) {
-            case "GET": self::render("auth/register");
+            case "GET": View::render($view);
                 break;
 
             case "POST":
@@ -29,7 +32,7 @@ class AuthController extends Controller {
                 $validator->check("password")->notEmpty("Password is required")->minLen(6, "Password must be at least 6 characteres");
 
                 if ($validator->hasErrors()) {
-                    self::render("auth/register", [
+                    View::render($view, [
                         "errors" => $validator->firtsErrors(),
                         "user" => $data,
                     ]);
@@ -47,7 +50,7 @@ class AuthController extends Controller {
                 }
                 
                 if (count($errors) > 0) {
-                    self::render("auth/register", [
+                    View::render($view, [
                         "errors" => $errors,
                         "user" => $data,
                     ]);
@@ -76,9 +79,11 @@ class AuthController extends Controller {
             header("Location: /home");
         }
 
+        $view = "auth/login";
+
         switch ($_SERVER["REQUEST_METHOD"]) {
             case "GET":
-                self::render("auth/login");
+                View::render($view);
                 break;
             
             case "POST":
@@ -92,9 +97,9 @@ class AuthController extends Controller {
                 $validator->check("password")->notEmpty("Password is required");
 
                 if ($validator->hasErrors()) {
-                    self::render("auth/login", [
+                    View::render($view, [
                         "errors" => $validator->firtsErrors(),
-                        "user" => ["identifier" => $data["identifier"]],
+                        "user" => $data,
                     ]);
                     
                     return;
@@ -105,7 +110,7 @@ class AuthController extends Controller {
                 $user = User::where($identifier, $data["identifier"])[0] ?? null;
 
                 if (is_null($user) || !password_verify($data["password"], $user->password)) {
-                    self::render("auth/login", [
+                    View::render($view, [
                         "errors" => ["Wrong $identifier or password"],
                         "user" => $data,
                     ]);
@@ -123,5 +128,13 @@ class AuthController extends Controller {
 
                 break;
         }
+    }
+
+    public static function logout(): void
+    {
+        session_start();
+        session_destroy();
+        
+        header("Location: /home");
     }
 }

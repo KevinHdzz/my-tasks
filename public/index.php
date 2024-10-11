@@ -2,56 +2,48 @@
 
 require '../bootstrap/app.php';
 
-use Kevinhdzz\MyTasks\Controllers\AuthController;
-use Kevinhdzz\MyTasks\Controllers\Controller;
-use Kevinhdzz\MyTasks\Models\Task;
-use Kevinhdzz\MyTasks\Models\User;
-use Kevinhdzz\MyTasks\Enums\TaskStatus;
-use Kevinhdzz\MyTasks\Routing\Router;
-use Kevinhdzz\MyTasks\Routing\Route;
-use Kevinhdzz\MyTasks\Exceptions\HttpNotFoundException;
+use MyTasks\Controllers\AuthController;
+use MyTasks\Controllers\TaskController;
+use MyTasks\Controllers\TasksApiController;
+use MyTasks\Controllers\UsersApiController;
+use MyTasks\Models\Task;
+use MyTasks\Models\User;
+use MyTasks\Enums\TaskStatus;
+use MyTasks\Routing\Router;
+use MyTasks\Routing\Route;
+use MyTasks\Exceptions\HttpNotFoundException;
+use MyTasks\View\View;
 
+Router::get(new Route(path: "/", action: fn () => header("Location: /home"), parameters: []));
 
-Router::get(new Route(path: "/home", action: function () {
+Router::get(new Route("/home", function () {
     session_start();
-    debug($_SESSION);
-    // if (!isset($_SESSION["user"])) {
-    //     header("Location: /login");
-    // }
-    Controller::render("home", [
-        "users" => User::all(),
-        "tasks" => Task::all(),
+    
+    if (!isAuth()) {
+        header("Location: /login");
+        return;
+    }
+
+    View::render("home", [
+        "tasks" => Task::where("user_id", $_SESSION["user"]["id"]),
     ]);
-}, parameters: []));
+}, []));
+
+// Authentication
 Router::get(new Route("/register", [AuthController::class, 'register']));
 Router::post(new Route("/register", [AuthController::class, 'register']));
 Router::get(new Route("/login", [AuthController::class, 'login']));
 Router::post(new Route("/login", [AuthController::class, 'login']));
-Router::get(new Route("/logout", function () {
-    session_start();
-    session_destroy();
-    header("Location: /home");
-}));
+Router::get(new Route("/logout", [AuthController::class, 'logout']));
 
-Router::get(new Route(path: "/tasks", action: function () {
-    println("<h2>Tasks:</h2>");
-    $tasks = Task::all();
-    foreach ($tasks as $task) {
-        println("$task->title  -  $task->description  -  {$task->status->value}  -  $task->user_id");
-        println();
-    }
-}, parameters: ["name", "id"]));
-
+// Task CRUD
 Router::get(new Route("/tasks/create", fn () => print "Add new Task"));
-Router::get(new Route("/tasks/update", function (Route $route) {
-    debug($route->parameters());
-}, parameters: ["id"]));
+Router::get(new Route("/tasks/update", function (Route $route) { debug($route->parameters()); }, parameters: ["id"]));
+Router::get(new Route("/tasks/change-status", [TaskController::class, 'changeStatus'], ["task-id", "status"]));
 
-
-Router::post(new Route("tasks/create", function (Route $route) {
-    debug($_POST);
-}));
-
+// Test API
+Router::get(new Route("/api/tasks", [TasksApiController::class, 'tasks'], ["id"]));
+Router::get(new Route("/api/users", [UsersApiController::class, 'users']));
 
 try {
     Router::resolve();

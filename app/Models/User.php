@@ -1,11 +1,11 @@
 <?php
 
-namespace Kevinhdzz\MyTasks\Models;
+namespace MyTasks\Models;
 
 class User extends BaseModel {
     protected string $table = 'users';
 
-    public array $columns = [
+    protected array $columns = [
         'id',
         'username',
         'email',

@@ -1,6 +1,6 @@
 <?php
 
-namespace Kevinhdzz\MyTasks\Helpers;
+namespace MyTasks\Helpers;
 
 use InvalidArgumentException;
 use ValueError;

@@ -4,7 +4,7 @@
     "type": "project",
     "autoload": {
         "psr-4": {
-            "Kevinhdzz\\MyTasks\\": "app/"
+            "MyTasks\\": "app/"
         },
         "files": [
             "app/Helpers/functions.php",

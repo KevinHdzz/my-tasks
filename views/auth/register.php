@@ -39,5 +39,5 @@
             </div>
         </form>
     </div>
-</body>
-</html>
+    
+<?php include __DIR__ . "/../partials/footer.php" ?>

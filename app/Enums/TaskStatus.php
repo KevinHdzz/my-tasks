@@ -1,6 +1,6 @@
 <?php
 
-namespace Kevinhdzz\MyTasks\Enums;
+namespace MyTasks\Enums;
 
 enum TaskStatus: string {
     case PENDING = 'pending';
